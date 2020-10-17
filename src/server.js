@@ -138,6 +138,23 @@ class Server {
 		this.turn++;
 		this.gameCurrentPlayer = this.turn % 2;
 	}
+	checkPlacement(row,col,color){
+		// check around itself in a circle
+		// col 1 2 3
+		for(let i = -1; i < 2; i++){
+			for(let j = -1; j < 2; j++){
+				if(this.currentGameMessage[row+i][col+j] == color){
+					let streak = 2;
+					for(let k = 0; k < 2; k++){
+						if(this.currentGameMessage[row+i + ((k+1) * i)][col+j + ((k+1) * j)] &&  i == j == 0){
+							streak++;
+						}
+					} // trace until streak breaks then go back and re go from opposite slope till done. 
+				} 
+			}
+		}
+
+	}
 }
 // export const Server;
 module.exports = Server;
