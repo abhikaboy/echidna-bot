@@ -8,8 +8,57 @@ const colors = [red,yellow];
 const sideBarColors = ["#FF0000","#FFFF00"];
 const numList = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"];
 
+
+let convertToMinTime = function(hour,minute){
+	return (hour*60)+minute;
+}
+
+class Block{
+	constructor(hour,minute,length, name){
+		this.hour = hour;
+		this.minute = minute;
+
+		// time of class written in minutes 
+		this.minTime = convertToMinTime(this.hour,this.minute); 
+
+		this.length = length;
+		this.name = name;
+	}
+	/**
+	 * 
+	 * @param {How long before class bot sends a starting warning} warnTime 
+	 * @param {Current time in Minute Time} currentTime 
+	 */
+	checkStartWarning(warnTime,currentTime,channel){
+		// warn people 1 minutes before class starts 
+		// if this class is [warn time] before current time
+		let shouldWarn = (this.minTime - currentTime == warnTime);
+		if(shouldWarn){
+			const embed = new MessageEmbed()
+				.setColor('#FF0000')
+				.setTitle(`${this.name} Will Start in ${warnTime} Minute(s)!`)
+				.setDescription(`get off your games you absolute scrub \n if you see this then someone's code worked on the first try without testing it lol`)
+			channel.send(embed);
+		}
+	}
+}
+
+
+
+const schedule = [	
+	new Block(7,30,60,"Block 1 AM Session"), 
+	new Block(8,35,60,"Block 2 AM Session"), 
+	new Block(9,40,60,"Block 3 AM Session"), 
+	new Block(10,45,60,"Block 4 AM Session"), 
+	new Block(11,45,45,"Lunch Break"), 
+	new Block(12,30,20,"Block 1 PM Session"), 
+	new Block(12,55,20,"Block 2 PM Session"), 
+	new Block(13,20,20,"Block 3 PM Session"), 
+	new Block(13,45,20,"Block 4 PM Session"),
+]
+
 class Server {
-	constructor(id) {
+	constructor(id,serverObject) {
 		this.id = id;
 		// this.name = name;
 		this.currentGame = "";
@@ -31,13 +80,14 @@ class Server {
 			[empty, empty, empty, empty, empty, empty, empty],
 		];
 		this.previousGameMessage;
+		this.scheduleChannelID = "768352806734135307"; 
+		this.serverObject = serverObject;
+		// console.log(this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0]);
+
+		// LMAO WHAT IS THIS LINE 
+		this.donaAlerts = this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0];
 	}
-	addCount() {
-		this.count++;
-	}
-	resetCount() {
-		this.count = 0;
-	}
+	// Gaming 
 	createPublicRequest(game, player1, channel) {
 		if (game == "Connect4") {
 			const embed = new MessageEmbed()
@@ -71,10 +121,12 @@ class Server {
 		}
 	}
 	test(channel) {
-		console.log("test");
-		console.log(this.gamePlayers);
-		this.placeCircle(2);
-		this.sendGameState(channel);
+		// console.log("test");
+		// console.log(this.gamePlayers);
+		// this.placeCircle(2);
+		// this.sendGameState(channel);
+		this.donaAlerts.send("This is a test alert!");
+		console.log("alert sent");
 	}
 	sendGameState(channel) {
 		console.log(this.gameCurrentPlayer + " THE CURRENT GAME PLAYER ");
@@ -144,7 +196,7 @@ class Server {
 		for(let i = -1; i < 2; i++){
 			for(let j = -1; j < 2; j++){
 				if(this.currentGameMessage[row+i][col+j] == color){
-					let streak = 2;
+					let streak = 2; // piece and then current piece we're looking at.
 					for(let k = 0; k < 2; k++){
 						if(this.currentGameMessage[row+i + ((k+1) * i)][col+j + ((k+1) * j)] &&  i == j == 0){
 							streak++;
@@ -155,6 +207,27 @@ class Server {
 		}
 
 	}
+	// Events 
+	eventUpdate(time){
+
+	}
+	// School 
+	scheduleUpdate(time){
+		let hour = time.getHours();
+		let minute = time.getMinutes();
+
+		schedule.forEach((block) => {block.checkStartWarning(1,convertToMinTime(hour,minute),this.donaAlerts)});
+	}
+	nextClass(time){
+
+	}
+	classEnd(time){
+
+	}
 }
+
+
+
+
 // export const Server;
 module.exports = Server;

@@ -15,7 +15,18 @@ class ServerCollection {
 			return item.id == id;
 		});
 		if (ret.length == 0) {
-			this.add(new Server(id)); // add to collection if not found
+			this.add(new Server(id,serverObject)); // add to collection if not found
+			return this.collection[this.collection.length - 1]; // returns server that was just created
+		} else {
+			return ret[0];
+		}
+	}
+	get(id,serverObject) {
+		let ret = this.collection.filter((item) => {
+			return item.id == id;
+		});
+		if (ret.length == 0) {
+			this.add(new Server(id,serverObject)); // add to collection if not found
 			return this.collection[this.collection.length - 1]; // returns server that was just created
 		} else {
 			return ret[0];

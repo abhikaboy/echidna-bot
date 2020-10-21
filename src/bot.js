@@ -11,6 +11,8 @@ const numList = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣
 let servers = require("./serverCollection");
 let Server = require("./server");
 
+
+
 client.on("ready", () => {
 	console.log(`${client.user.username} online!`);
 	client.user.setPresence({
@@ -21,6 +23,12 @@ client.on("ready", () => {
 			url: 'https://www.twitch.tv/chippy'
 		}
 	})
+	let time;
+	setInterval(() => {
+		// loop through servers and call event update.
+		time = new Date();
+		servers.collection.forEach(server => {server.eventUpdate(time); server.scheduleUpdate(time)});
+	},60 * 1000) // 1 minute 
 });
 client.on("messageReactionAdd", (messageReaction, user) => {
 	if (user.bot) return;
@@ -43,8 +51,12 @@ client.on("messageReactionAdd", (messageReaction, user) => {
 });
 client.on("message", (message) => {
 	// if(message.author.bot) return;
-	//console.log(`${message.author.tag} sent a message: ${message.content}`);
+	
+	// temp
+	servers.get(message.guild.id,message.guild);
+
 	// User wants to issue a command
+	servers.get(message.guild.id).serverObject = message.guild; // need to do this a better way in the future. 
 	if (message.content.startsWith(PREFIX)) {
 		const [cmdName, ...args] = message.content
 			.trim()
@@ -52,12 +64,12 @@ client.on("message", (message) => {
 			.split(/\s+/);
 		let serverId = message.guild.id;
 		console.log(args);
-		switch (cmdName) {
+		switch (cmdName.toLowerCase()) {
 			case "test":
 				servers.get(serverId).test(message.channel);
 				break;
-			case "Challenge" || "challenge":
-				if (args[0] == "Accept") {
+			case "challenge" || "challenge":
+				if (args[0] == "Accept" || args[0] == "accept") {
 					servers
 						.get(serverId)
 						.acceptRequest(message.author, message.channel);
@@ -69,10 +81,7 @@ client.on("message", (message) => {
 							message.author,
 							message.channel
 						);
-				} else if(args[0]){
-					
-					
-				}else {
+				} else {
 					// servers
 					// 	.get(serverId)
 					// 	.createMatch(
@@ -83,6 +92,25 @@ client.on("message", (message) => {
 					// 	);
 				}
 				break;
+			case "nextclass":
+				message.reply(servers.get(serverId).nextClass(new Date()));
+				break;
+			case "classend":
+				message.reply(servers.get(serverId).classEnd(new Date()));
+				break;
+			case "schedule":
+				message.reply();
+				break;
+			case "event":
+				
+				/*
+					Create 
+					public, @ role
+					Event Name 
+					time in EST
+				*/
+				message.reply("I dont do this yet");
+				break;
 			case "help":
 				message.reply(
 					"\n i dont actually do anything and im a scam edit: i promise this will actually do something just wait like 4 more years"
@@ -92,7 +120,7 @@ client.on("message", (message) => {
 				servers.get(serverId).addCount();
 				message.reply(servers.get(serverId).count);
 				break;
-			case "collectionStats":
+			case "collectionstats":
 				message.channel.send("check console");
 				console.log(servers);
 				break;
