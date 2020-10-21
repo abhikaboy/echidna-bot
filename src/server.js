@@ -46,15 +46,15 @@ class Block{
 
 
 const schedule = [	
-	new Block(7,30,60,"Block 1 AM Session"), 
-	new Block(8,35,60,"Block 2 AM Session"), 
-	new Block(9,40,60,"Block 3 AM Session"), 
-	new Block(10,45,60,"Block 4 AM Session"), 
+	new Block(7,30,60,"Block 1 (AM)"), 
+	new Block(8,35,60,"Block 2 (AM)"), 
+	new Block(9,40,60,"Block 3 (AM)"), 
+	new Block(10,45,60,"Block 4 (AM)"), 
 	new Block(11,45,45,"Lunch Break"), 
-	new Block(12,30,20,"Block 1 PM Session"), 
-	new Block(12,55,20,"Block 2 PM Session"), 
-	new Block(13,20,20,"Block 3 PM Session"), 
-	new Block(13,45,20,"Block 4 PM Session"),
+	new Block(12,30,20,"Block 1 (PM)"), 
+	new Block(12,55,20,"Block 2 (PM)"), 
+	new Block(13,20,20,"Block 3 (PM)"), 
+	new Block(13,45,20,"Block 4 (PM)"),
 ]
 
 class Server {
@@ -212,17 +212,40 @@ class Server {
 
 	}
 	// School 
-	scheduleUpdate(time){
+	scheduleUpdate(time,channel){
 		let hour = time.getHours();
 		let minute = time.getMinutes();
 
 		schedule.forEach((block) => {block.checkStartWarning(1,convertToMinTime(hour,minute),this.donaAlerts)});
+		console.log("updated schedule");
 	}
 	nextClass(time){
+		let hour = time.getHours();
+		let minute = time.getMinutes();
+		let minTime = convertToMinTime(hour,minute);
+		let message;
+		try{
+			let nextClass = schedule.find((block) => block.minTime > minTime)
+			message = `${nextClass.name} will start in ${nextClass.minTime - minTime} Minute(s)`;
+		} catch(err){
+			message = "either someone doens't know what theyre doing or classes have eneded for today.";
+		}
+		return message;
 
 	}
 	classEnd(time){
+		let hour = time.getHours();
+		let minute = time.getMinutes();
 
+		let minTime = convertToMinTime(hour,minute);
+		let message;
+		try{
+			let thisClass = schedule.find((block) => /*block.minTime < minTime*/ block.minTime + block.length > minTime )
+			message = `${thisClass.name} will end in ${thisClass.minTime + thisClass.length - minTime} Minute(s)`;
+		} catch(err){
+			message = "either someone doens't know what theyre doing or classes have eneded for today. (or haven't started)";
+		}
+		return message;
 	}
 }
 
