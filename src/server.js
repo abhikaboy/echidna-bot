@@ -1,5 +1,6 @@
 const { DiscordAPIError } = require("discord.js");
 const {  MessageEmbed } = require("discord.js");
+const event = require("./events.js");
 
 const empty = ":white_circle:";
 const red = ":red_circle:";
@@ -35,7 +36,7 @@ class Block{
 		let shouldWarn = (this.minTime - currentTime == warnTime);
 		if(shouldWarn){
 			const embed = new MessageEmbed()
-				.setColor('#FF0000')
+				.setColor('#9400D3')
 				.setTitle(`${this.name} Will Start in ${warnTime} Minute(s)!`)
 				.setDescription(`get off your games you absolute scrub \n if you see this then someone's code worked on the first try without testing it lol`)
 			channel.send(embed);
@@ -43,24 +44,30 @@ class Block{
 	}
 }
 
+const amLen = 60;
+const lunchLen = 45;
+const pmLen = 20;
 
+const friLen = 30;
 
 const schedule = [	
-	new Block(7,30,60,"Block 1 (AM)"), 
-	new Block(8,35,60,"Block 2 (AM)"), 
-	new Block(9,40,60,"Block 3 (AM)"), 
-	new Block(10,45,60,"Block 4 (AM)"), 
-	new Block(11,45,45,"Lunch Break"), 
-	new Block(12,30,20,"Block 1 (PM)"), 
-	new Block(12,55,20,"Block 2 (PM)"), 
-	new Block(13,20,20,"Block 3 (PM)"), 
-	new Block(13,45,20,"Block 4 (PM)"),
+	new Block(8,15,friLen,"Block 1A "), 
+	new Block(8,55,friLen,"Block 1B "), 
+	new Block(9,35,friLen,"Block 2A "), 
+	new Block(10,15,friLen,"Block 2B"), 
+	new Block(10,55,friLen,"Block 3A "), 
+	new Block(11,35,friLen,"Block 3B "), 
+	new Block(12,15,friLen,"Lunch Break"), 
+	new Block(12,55,friLen,"Block 4A "),
+	new Block(13,35,friLen,"Block 4B"),
 ]
 
 class Server {
 	constructor(id,serverObject) {
 		this.id = id;
 		// this.name = name;
+
+		// game 
 		this.currentGame = "";
 		this.currentlyPlaying = false;
 		this.gameState = {};
@@ -80,16 +87,26 @@ class Server {
 			[empty, empty, empty, empty, empty, empty, empty],
 		];
 		this.previousGameMessage;
+
+		// schedule 
 		this.scheduleChannelID = "768352806734135307"; 
+		
+		// alerts
 		this.serverObject = serverObject;
+
+		// events
+		this.events = [];
+
 		// console.log(this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0]);
+
+
 
 		// LMAO WHAT IS THIS LINE 
 		this.donaAlerts = this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0];
 	}
 	// Gaming 
 	createPublicRequest(game, player1, channel) {
-		if (game == "Connect4") {
+		if (game.toLowerCase() == "connect4") {
 			const embed = new MessageEmbed()
 				.setColor('#FF0000')
 				.setTitle('Creating a Public Connect 4 Game...')
@@ -121,10 +138,6 @@ class Server {
 		}
 	}
 	test(channel) {
-		// console.log("test");
-		// console.log(this.gamePlayers);
-		// this.placeCircle(2);
-		// this.sendGameState(channel);
 		this.donaAlerts.send("This is a test alert!");
 		console.log("alert sent");
 	}
@@ -207,9 +220,15 @@ class Server {
 		}
 
 	}
+	cancel(id,channel){
+		channel.send(`${id}, if you don’t fully understand something, maybe don’t make a joke about it. ok?`);
+	}
 	// Events 
 	eventUpdate(time){
+		let hour = time.getHours();
+		let minute = time.getMinutes();
 
+		// this.events.forEach((event) => event.update());
 	}
 	// School 
 	scheduleUpdate(time,channel){
@@ -217,7 +236,6 @@ class Server {
 		let minute = time.getMinutes();
 
 		schedule.forEach((block) => {block.checkStartWarning(1,convertToMinTime(hour,minute),this.donaAlerts)});
-		console.log("updated schedule");
 	}
 	nextClass(time){
 		let hour = time.getHours();

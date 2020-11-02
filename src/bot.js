@@ -1,8 +1,8 @@
 require("dotenv").config();
 //import { Client } from "discord.js";
-const { Client, MessageAttachment, Message } = require("discord.js");
+const { Client, MessageAttachment, Message, MessageEmbed } = require("discord.js");
 const client = new Client();
-const PREFIX = "~";
+const PREFIX = "!";
 const numList = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"];
 // so sad i cant use cool syntax
 // import { servers } from "./serverCollection";
@@ -10,6 +10,7 @@ const numList = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣
 
 let servers = require("./serverCollection");
 let Server = require("./server");
+let event = require("./events.js");
 
 
 
@@ -53,7 +54,12 @@ client.on("message", (message) => {
 	// if(message.author.bot) return;
 	
 	// temp
-	servers.get(message.guild.id,message.guild);
+	try{
+		servers.get(message.guild.id,message.guild);
+	} catch(err){
+		console.log(err);
+		console.log(message);
+	}
 
 	// User wants to issue a command
 	servers.get(message.guild.id).serverObject = message.guild; // need to do this a better way in the future. 
@@ -63,17 +69,20 @@ client.on("message", (message) => {
 			.substring(PREFIX.length)
 			.split(/\s+/);
 		let serverId = message.guild.id;
+		let server = servers.get(serverId);
 		console.log(args);
 		switch (cmdName.toLowerCase()) {
 			case "test":
-				servers.get(serverId).test(message.channel);
+				server.test(message.channel);
 				break;
-			case "challenge" || "challenge":
+			case "challenge" || "Challenge":
+				console.log("Someone send a challegne command");
 				if (args[0] == "Accept" || args[0] == "accept") {
 					servers
 						.get(serverId)
 						.acceptRequest(message.author, message.channel);
 				} else if (args[0] == "public") {
+					console.log("public");
 					servers
 						.get(serverId)
 						.createPublicRequest(
@@ -92,14 +101,19 @@ client.on("message", (message) => {
 					// 	);
 				}
 				break;
+			case "cancel":
+				if(args[0] == '<@!185595163920302080>'){
+					message.channel.send("You cannot cancel god.");
+				} else {
+				servers
+				.get(serverId).cancel(args[0],message.channel);
+				}
+				break;
 			case "nextclass":
-				message.reply(servers.get(serverId).nextClass(new Date()));
+				message.reply(server.nextClass(new Date()));
 				break;
 			case "classend":
-				message.reply(servers.get(serverId).classEnd(new Date()));
-				break;
-			case "schedule":
-				message.reply();
+				message.reply(server.classEnd(new Date()));
 				break;
 			case "event":
 				
@@ -109,24 +123,89 @@ client.on("message", (message) => {
 					Event Name 
 					time in EST
 				*/
-				message.reply("I dont do this yet");
+				try{
+					switch(args[0].toLowerCase()){
+						case "create":
+							message.reply("event create process");
+							break;
+						case "list":
+							message.reply("event list");
+							break;
+						case "help":
+							const eventHelpEmbed = new MessageEmbed()
+							.setColor('#90ee90')
+							.setTitle('Event Help Menu')
+							.setDescription(`
+							**!event create**
+							  > create a new event, starts event creation process
+
+							**!event cancel**
+							  > cancels an event, only the creator of the event can do this
+
+							**!event <eventName> list**
+							  > lists all participants
+
+							**!event <eventName> warn**
+							  > mentions all users who are not in the event voice chat 
+
+							**!event <eventName> details**
+							  > sends the details of a specific event
+
+							**!event <eventName> addguest <@user>**
+							  > allows a user to join the voice channel of an event lobby
+
+							**!event <eventName> widthdraw <reason>** 
+							  > remove yourself from an event, reason is optional
+
+							`);
+							message.reply(eventHelpEmbed);
+							break;
+						default:
+							message.reply("default: event help");
+							break;
+					}
+				} catch(err){
+					message.reply("default: event help");
+				}
 				break;
 			case "help":
-				message.reply(
-					"\n i dont actually do anything and im a scam edit: i promise this will actually do something just wait like 4 more years"
-				);
-				break;
-			case "add":
-				servers.get(serverId).addCount();
-				message.reply(servers.get(serverId).count);
+				const helpEmbed = new MessageEmbed()
+				.setColor('#90ee90')
+				.setTitle('Help Menu')
+				.setDescription(`
+				**ADDED**
+				**!help **
+				  > Sends a list of all commands 
+				**!nextclass **
+				  > Sends when the next class will start 
+				**!classend **
+				  > Sends when the current class will start
+				**!challenge**
+				  > Challenge your friends or anyone in a game
+				**!challenge help**
+				  > Explains Challenge a bit more
+				**!cancel <user>**
+				  > Twitter cancel a user of your choice. \n
+
+				**NOT YET ADDED**
+				**!event create**
+				  > Schedule events with your server
+				**!event help**
+				  > Explains events and how to set up an event
+				**!event list**
+				   > list out ongoing/future events
+				**!chem, !math, !english, etc...**
+					> sends a zoom link for the class depending on the time
+				**!sarthak**
+					> deletes the server
+				`)
+				.setThumbnail("https://cdn.discordapp.com/attachments/760776202121117706/772683453237559317/IMG_0529.PNG")
+				.setFooter(`** this is still a work in progress **`)
+				message.reply(helpEmbed);
 				break;
 			case "collectionstats":
 				message.channel.send("check console");
 				console.log(servers);
-				break;
-			case "reset":
-				servers.get(serverId).resetCount();
-				message.reply(servers.get(serverId).count);
 				break;
 			case "punch":
 				const attachment = new MessageAttachment(
@@ -142,32 +221,10 @@ client.on("message", (message) => {
 				}
 				message.channel.send(attachment);
 				break;
-			case "genocide":
-				message.channel.send(
-					"You really thought something would happen"
-				);
-				break;
-			case "minecraftkirby":
-				const mcKirby = new MessageAttachment(
-					"https://cdn.vox-cdn.com/thumbor/kAG-y5f-SC0w5h05BkQnV64kqO4=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/21927213/minecraft.jpg"
-				);
-				message.channel.send(mcKirby);
-				// https://cdn.vox-cdn.com/thumbor/kAG-y5f-SC0w5h05BkQnV64kqO4=/1400x1400/filters:format(jpeg)/cdn.vox-cdn.com/uploads/chorus_asset/file/21927213/minecraft.jpg
-				break;
 		}
-	} else if (
-		message.content.toLowerCase().trim().split(/\s+/).includes("obby") ||
-		message.content.toLowerCase().trim().split(/\s+/).includes("obsidian")
-	) {
-		message.channel.send(
-			"Oh? you dare mention such a crappy macro game option? you are truly the lowest of low."
-		);
-	} else if (
-		message.content.trim().split(/\s+/).includes("mc") ||
-		message.content.trim().split(/\s+/).includes("minecraft") ||
-		message.content.trim().split(/\s+/).includes("bedwars")
-	) {
-		message.channel.send("playing games during class i see");
-	}
+	} 
+	//  if message contains wordd 'obby"
+	//	message.content.toLowerCase().trim().split(/\s+/).includes("obby")
+
 });
 client.login(process.env.DISCORDJS_BOT_TOKEN);
