@@ -1,39 +1,11 @@
+const EventData = require("./eventData");
+
 class Event{
-    constructor(){
-        this.users = [];
-        this.creator = {};
-        this.name;
-        this.time;
-        this.date;
-        this.description;
+    constructor(creator){
+        this.data = new EventData();
+        this.data.creator = creator;
     }
-    setName(name){
 
-    }
-    setTime(time){
-
-    }
-    setDate(date){
-
-    }
-    setDescription(description){
-
-    }
-    setLimit(limit){
-
-    }
-    toggleHardLimit(){
-
-    }
-    setVoiceChannel(id){
-
-    }
-    setTextChannel(id){
-
-    }
-    allowGuest(id){
-
-    }
 }
 
 module.exports = Event;

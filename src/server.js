@@ -1,5 +1,6 @@
 const { DiscordAPIError } = require("discord.js");
 const {  MessageEmbed } = require("discord.js");
+const EventManager = require("./eventManager.js");
 const event = require("./events.js");
 
 const empty = ":white_circle:";
@@ -50,18 +51,40 @@ const pmLen = 20;
 
 const friLen = 30;
 
-const schedule = [	
-	new Block(8,15,friLen,"Block 1A "), 
-	new Block(8,55,friLen,"Block 1B "), 
-	new Block(9,35,friLen,"Block 2A "), 
-	new Block(10,15,friLen,"Block 2B"), 
-	new Block(10,55,friLen,"Block 3A "), 
-	new Block(11,35,friLen,"Block 3B "), 
-	new Block(12,15,friLen,"Lunch Break"), 
-	new Block(12,55,friLen,"Block 4A "),
-	new Block(13,35,friLen,"Block 4B"),
+const virtualLen = 65;
+/*
+
+const schedule = [
+    new Block(7,30,60,"Block 1 (AM)"), 
+    new Block(8,35,60,"Block 2 (AM)"), 
+    new Block(9,40,60,"Block 3 (AM)"), 
+    new Block(10,45,60,"Block 4 (AM)"), 
+    new Block(11,45,45,"Lunch Break"), 
+    new Block(12,30,20,"Block 1 (PM)"), 
+    new Block(12,55,20,"Block 2 (PM)"), 
+    new Block(13,20,20,"Block 3 (PM)"), 
+    new Block(13,45,20,"Block 4 (PM)"),
 ]
 
+	new Block(8,20,virtualLen,"Block 1"), 
+	new Block(9,35,virtualLen,"Block 2"), 
+	new Block(10,50,virtualLen,"Block 3"), 
+	new Block(12,00,friLen,"Lunch Break"), 
+	new Block(12,40,virtualLen,"Block 4"),
+
+*/
+const schedule = [	
+    new Block(7,30,60,"Block 1 (AM)"), 
+    new Block(8,35,60,"Block 2 (AM)"), 
+    new Block(9,40,60,"Block 3 (AM)"), 
+    new Block(10,45,60,"Block 4 (AM)"), 
+    new Block(11,45,45,"Lunch Break"), 
+    new Block(12,30,20,"Block 1 (PM)"), 
+    new Block(12,55,20,"Block 2 (PM)"), 
+    new Block(13,20,20,"Block 3 (PM)"), 
+    new Block(13,45,20,"Block 4 (PM)"),
+]
+ 
 class Server {
 	constructor(id,serverObject) {
 		this.id = id;
@@ -95,12 +118,8 @@ class Server {
 		this.serverObject = serverObject;
 
 		// events
-		this.events = [];
-
-		// console.log(this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0]);
-
-
-
+		this.eventManager = new EventManager();
+		
 		// LMAO WHAT IS THIS LINE 
 		this.donaAlerts = this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0];
 	}
@@ -265,6 +284,7 @@ class Server {
 		}
 		return message;
 	}
+
 }
 
 

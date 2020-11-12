@@ -63,13 +63,18 @@ client.on("message", (message) => {
 
 	// User wants to issue a command
 	servers.get(message.guild.id).serverObject = message.guild; // need to do this a better way in the future. 
+
+	let serverId;
+	let server;
+
 	if (message.content.startsWith(PREFIX)) {
+
 		const [cmdName, ...args] = message.content
 			.trim()
 			.substring(PREFIX.length)
 			.split(/\s+/);
-		let serverId = message.guild.id;
-		let server = servers.get(serverId);
+		serverId = message.guild.id;
+		server = servers.get(serverId);
 		console.log(args);
 		switch (cmdName.toLowerCase()) {
 			case "test":
@@ -126,7 +131,23 @@ client.on("message", (message) => {
 				try{
 					switch(args[0].toLowerCase()){
 						case "create":
-							message.reply("event create process");
+							if(message.member.hasPermission('ADMINISTRATOR')){
+								message.reply("You are an admin, creating event");
+								server.eventManager.createEvent(message.member,message.channel);
+							} else {
+								message.reply("ayo youre not an admin");
+							}
+							break;
+						case "parameter":
+							if(server.eventManager.creatingEvent && server.eventManager.currentEventCreator == message.member){
+								console.log("running from command");
+								server.eventManager.processParameter(message.content);
+							}
+							else if(!server.eventManager.creatingEvent){
+								message.reply("No event is current being made, you can start one using !event create");
+							} else{
+								message.reply("You are not the creator of the event.");
+							}
 							break;
 						case "list":
 							message.reply("event list");
@@ -153,10 +174,6 @@ client.on("message", (message) => {
 
 							**!event <eventName> addguest <@user>**
 							  > allows a user to join the voice channel of an event lobby
-
-							**!event <eventName> widthdraw <reason>** 
-							  > remove yourself from an event, reason is optional
-
 							`);
 							message.reply(eventHelpEmbed);
 							break;
@@ -165,6 +182,7 @@ client.on("message", (message) => {
 							break;
 					}
 				} catch(err){
+					console.log(err);
 					message.reply("default: event help");
 				}
 				break;
@@ -223,6 +241,7 @@ client.on("message", (message) => {
 				break;
 		}
 	} 
+
 	//  if message contains wordd 'obby"
 	//	message.content.toLowerCase().trim().split(/\s+/).includes("obby")
 
