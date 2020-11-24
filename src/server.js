@@ -122,6 +122,7 @@ class Server {
 		
 		// LMAO WHAT IS THIS LINE 
 		this.donaAlerts = this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0];
+
 	}
 	// Gaming 
 	createPublicRequest(game, player1, channel) {
@@ -240,7 +241,11 @@ class Server {
 
 	}
 	cancel(id,channel){
-		channel.send(`${id}, if you don’t fully understand something, maybe don’t make a joke about it. ok?`);
+		if(id == "<@185595163920302080>" || id == "Suntex" || id == "Abhik"){
+			channel.send("You cant cancel god.")
+		} else {
+			channel.send(`${id}, if you don’t fully understand something, maybe don’t make a joke about it. ok?`);
+		}
 	}
 	// Events 
 	eventUpdate(time){

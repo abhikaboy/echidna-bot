@@ -35,8 +35,9 @@ class EventData{
         this.lockVoiceChannel = lVC;
         this.markOverflow = mOF;
     }
-    setTime(time,date){
-
+    setTime(time,days){
+        this.time = time;
+        this.days = days; 
     }
 }
 module.exports = EventData;

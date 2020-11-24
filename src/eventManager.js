@@ -8,6 +8,14 @@ class EventManager{
         this.currentEventCreator;
         this.stage = 0;
         this.creationChannel = {};
+        this.cancelMessageID = '';
+    }
+    
+    resetEventProcess(){
+        this.creatingEvent = false;
+        this.currentEventCreator;
+        this.stage = 0;
+        this.creationChannel = {};
     }
     createEvent(user, channel){
         if(!this.creatingEvent){
@@ -25,9 +33,9 @@ class EventManager{
         setTimeout( () => { 
             console.log("checking time out")
 
-            if(this.preTimeoutStage == this.stage){   
+            if(this.preTimeoutStage == this.stage &&  this.creationCChennel != {}){   
                 this.creationChannel.send("Timed Out. No Response Given");
-                this.closeEventProcess();
+                this.resetEventProcess();
             } else {
                 console.log("did not time out")
                 return
@@ -49,6 +57,12 @@ class EventManager{
         this.preTimeoutStage = this.stage;
         this.checkTimeout();
     }
+
+    createEventTime(){
+        this.creationChannel.send("Use !event parameter **[Hour in Military Time EST]&[Minute]&[Number of Days until event (put 0 if today)]**");
+        this.preTimeoutStage = this.stage;
+        this.checkTimeout();
+    }
     processParameter(content){
         console.log("ran process");
         console.log(content + " THJIS MESSAGE RAN PROCESS");
@@ -59,29 +73,29 @@ class EventManager{
                 this.events[this.events.length-1].data.setDetails(...params);
                 this.creationChannel.send("set details");
                 this.createEventBools();
+                this.stage++;
                 break;
             case 1:
                 params = params.map((string) => string == "true");
                 this.events[this.events.length-1].data.setBools(...params);
+                this.createEventTime();
                 this.creationChannel.send("set bools");
+                this.stage++;
                 break;
             case 2:
-               // this.events[this.events.length-1].data.setDetails(...params);
-                this.creationChannel.send("set 2");
+                // horus * 60 + minutes this is the same as convert to min time. 
+                let hourArrayPos = 0;
+                let minuteArrayPos = 1;
+                let daysUntilArrayPos = 2;
+                // these are hard coded array positions ;/ 
+                let minTime = (params[hourArrayPos]*60)+params[minuteArrayPos];
+                this.events[this.events.length-1].data.setTime(minTime,params[daysUntilArrayPos]);
+                this.creationChannel.send("Created Event! check !event list to view your event");
+                this.resetEventProcess();
                 break;
         }
-        this.stage++;
         console.log(params);
     }
-
-    closeEventProcess(){
-        console.log("closed event");
-        this.creatingEvent = false; 
-    }
-    createEventTime(){
-
-    }
-
     cancelEvent(eventID,user){
 
     }

@@ -47,8 +47,11 @@ client.on("messageReactionAdd", (messageReaction, user) => {
 			console.log("sent game state");
 		}
 	} catch(err){
-		
+		console.log(err);
 	}
+	
+//	if()
+
 });
 client.on("message", (message) => {
 	// if(message.author.bot) return;
@@ -78,6 +81,7 @@ client.on("message", (message) => {
 		console.log(args);
 		switch (cmdName.toLowerCase()) {
 			case "test":
+				//message.channel.send("ok");
 				server.test(message.channel);
 				break;
 			case "challenge" || "Challenge":
@@ -107,7 +111,7 @@ client.on("message", (message) => {
 				}
 				break;
 			case "cancel":
-				if(args[0] == '<@!185595163920302080>'){
+				if(args[0] == '<@!185595163920302080>'){ // lol hard coded
 					message.channel.send("You cannot cancel god.");
 				} else {
 				servers
@@ -122,12 +126,9 @@ client.on("message", (message) => {
 				break;
 			case "event":
 				
-				/*
-					Create 
-					public, @ role
-					Event Name 
-					time in EST
-				*/
+				//args[0] = (args[0] == undefined) ? "none":args[0];
+				args[0] = (args[0] || "none");
+
 				try{
 					switch(args[0].toLowerCase()){
 						case "create":
@@ -140,7 +141,6 @@ client.on("message", (message) => {
 							break;
 						case "parameter":
 							if(server.eventManager.creatingEvent && server.eventManager.currentEventCreator == message.member){
-								console.log("running from command");
 								server.eventManager.processParameter(message.content);
 							}
 							else if(!server.eventManager.creatingEvent){
@@ -151,6 +151,32 @@ client.on("message", (message) => {
 							break;
 						case "list":
 							message.reply("event list");
+							console.log(server.eventManager.events);
+							server.eventManager.events.forEach((event) => {
+							//	console.log(event.data.user.username);
+							const timingMessage = (event.data.days == 0) ? " Today":` in ${event.data.days} days`;
+								const eventEmbed = new MessageEmbed()							
+								.setColor('#90ee90')
+								.setTitle(event.data.name+timingMessage)
+								.setDescription(`Created by ${event.data.creator.user.username} \n ${event.data.description}`)
+								.setFooter(`${event.data.users.length} / ${event.data.limit}`);
+								message.reply(eventEmbed);
+							})
+
+							break;
+						case "cancel":
+							let cancelMessage = "**Events:** \n";
+							console.log(server.eventManager.events);
+							for(const [index, element] of Object.entries(server.eventManager.events)){
+								console.log(element);
+								cancelMessage += `${numList[index]}. ${element.data.name} \n`;
+							}
+							message.channel.send(cancelMessage).then((message) => {
+								server.eventManager.cancelMessageID = message.id;
+								for(const [index,element] of Object.entries(server.eventManager.events)){
+									message.react(numList[index]);
+								}
+							})
 							break;
 						case "help":
 							const eventHelpEmbed = new MessageEmbed()
@@ -162,6 +188,9 @@ client.on("message", (message) => {
 
 							**!event cancel**
 							  > cancels an event, only the creator of the event can do this
+
+							**!event list**
+							  > lists all the events on the server
 
 							**!event <eventName> list**
 							  > lists all participants
@@ -177,13 +206,16 @@ client.on("message", (message) => {
 							`);
 							message.reply(eventHelpEmbed);
 							break;
+						case "none":
+							message.reply("Pass in aan Arguement");
+							break;
 						default:
-							message.reply("default: event help");
+							message.reply("default");
 							break;
 					}
 				} catch(err){
 					console.log(err);
-					message.reply("default: event help");
+					message.reply("error");
 				}
 				break;
 			case "help":
