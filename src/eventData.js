@@ -21,6 +21,10 @@ class EventData{
 
 
         this.guests = [];
+        this.role = {};
+        this.textChannel = {};
+        this.voiceChannel = {};
+
     }
     setDetails(name,description,limit){
         this.name = name;

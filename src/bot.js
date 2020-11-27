@@ -36,6 +36,7 @@ client.on("messageReactionAdd", (messageReaction, user) => {
 	let serverId = messageReaction.message.guild.id;
 	let server = servers.get(serverId);
 	try{
+		//
 		console.log(server.gamePlayers[server.gameCurrentPlayer].id);
 		if(user.id == server.gamePlayers[server.gameCurrentPlayer].id){ // game players array at index current game player
 			let userReact = messageReaction.emoji.name;
@@ -54,14 +55,14 @@ client.on("messageReactionAdd", (messageReaction, user) => {
 
 });
 client.on("message", (message) => {
-	// if(message.author.bot) return;
+	// if(message.author.bot) return;x`
 	
 	// temp
 	try{
 		servers.get(message.guild.id,message.guild);
 	} catch(err){
 		console.log(err);
-		console.log(message);
+		console.log(message.content);
 	}
 
 	// User wants to issue a command

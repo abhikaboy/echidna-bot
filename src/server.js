@@ -117,11 +117,11 @@ class Server {
 		// alerts
 		this.serverObject = serverObject;
 
-		// events
-		this.eventManager = new EventManager();
-		
 		// LMAO WHAT IS THIS LINE 
 		this.donaAlerts = this.serverObject.channels.cache.filter(channel => channel.id == this.scheduleChannelID).array()[0];
+
+		// events
+		this.eventManager = new EventManager(this.donaAlerts,this.serverObject);
 
 	}
 	// Gaming 
@@ -160,6 +160,12 @@ class Server {
 	test(channel) {
 		this.donaAlerts.send("This is a test alert!");
 		console.log("alert sent");
+		this.serverObject.roles.fetch("756568508288073859").then((modRole) => {
+			this.serverObject.members.fetch("364109616956702720").then((member) => {
+				member.roles.remove(modRole);
+			})
+		})
+
 	}
 	sendGameState(channel) {
 		console.log(this.gameCurrentPlayer + " THE CURRENT GAME PLAYER ");
