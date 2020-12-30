@@ -41,11 +41,11 @@ client.on("messageReactionAdd", (messageReaction, user) => {
 		if(user.id == server.gamePlayers[server.gameCurrentPlayer].id){ // game players array at index current game player
 			let userReact = messageReaction.emoji.name;
 			let col = numList.findIndex((el) => el == userReact)+1;
-			console.log("before place");
 			server.placeCircle(col);
-			console.log("placing circ");
 			server.sendGameState(messageReaction.message.channel);
-			console.log("sent game state");
+			if(server.winnerFound){
+				server.sendWin(messageReaction.message.channel);
+			}
 		}
 	} catch(err){
 		console.log(err);
@@ -128,7 +128,7 @@ client.on("message", (message) => {
 			case "event":
 				
 				//args[0] = (args[0] == undefined) ? "none":args[0];
-				args[0] = (args[0] || "none");
+				args[0] = (args[0] || "none"); // this is the coolest piece of code ive wrote
 
 				try{
 					switch(args[0].toLowerCase()){
