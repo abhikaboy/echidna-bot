@@ -277,6 +277,9 @@ client.on("message", (message) => {
 
 	//  if message contains wordd 'obby"
 	//	message.content.toLowerCase().trim().split(/\s+/).includes("obby")
-
+	let words = message.content.toLowerCase().trim().split(/\s+/);
+	if(words.includes("gm") || words.includes("goodmorning")){
+		message.channel.send("Good morning :)");
+	}
 });
 client.login(process.env.DISCORDJS_BOT_TOKEN);
