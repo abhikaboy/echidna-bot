@@ -55,9 +55,7 @@ client.on("messageReactionAdd", (messageReaction, user) => {
 
 });
 client.on("message", (message) => {
-	// if(message.author.bot) return;x`
-	
-	// temp
+	// if(message.author.bot) return;
 	try{
 		servers.get(message.guild.id,message.guild);
 	} catch(err){
