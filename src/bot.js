@@ -26,6 +26,8 @@ const options = {
 	minute: "numeric",
 	second: "numeric",
 };
+
+const estOffset = -300;
 client.on("ready", () => {
 	console.log(`${client.user.username} online!`);
 	client.user.setPresence({
@@ -37,7 +39,6 @@ client.on("ready", () => {
 		},
 	});
 	let time;
-	const estOffset = -300;
 	setInterval(() => {
 		// loop through servers and call event update.
 
@@ -135,10 +136,14 @@ client.on("message", message => {
 				}
 				break;
 			case "nextclass":
-				message.reply(server.nextClass(new Date()));
+				let time = new Date();
+				time.setTime(time.getTime() + estOffset * 60 * 1000);
+				message.reply(server.nextClass(time));
 				break;
 			case "classend":
-				message.reply(server.classEnd(new Date()));
+				let time = new Date();
+				time.setTime(time.getTime() + estOffset * 60 * 1000);
+				message.reply(server.classEnd(time));
 				break;
 			case "event":
 				//args[0] = (args[0] == undefined) ? "none":args[0];
