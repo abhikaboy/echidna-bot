@@ -1,6 +1,11 @@
 require("dotenv").config();
 //import { Client } from "discord.js";
-const { Client, MessageAttachment, Message, MessageEmbed } = require("discord.js");
+const {
+	Client,
+	MessageAttachment,
+	Message,
+	MessageEmbed,
+} = require("discord.js");
 const client = new Client();
 const PREFIX = "!";
 const numList = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣", "7️⃣"];
@@ -11,66 +16,67 @@ const numList = ["1️⃣", "2️⃣", "3️⃣", "4️⃣", "5️⃣", "6️⃣
 let servers = require("./serverCollection");
 let Server = require("./server");
 let event = require("./events.js");
-
-
+const { DateTime } = require("luxon");
 
 client.on("ready", () => {
 	console.log(`${client.user.username} online!`);
 	client.user.setPresence({
-		status: 'online',
+		status: "online",
 		activity: {
-			name: 'do @suntex if u see this',
-			type: 'STREAMING',
-			url: 'https://www.twitch.tv/chippy'
-		}
-	})
+			name: "do @suntex if u see this",
+			type: "STREAMING",
+			url: "https://www.twitch.tv/chippy",
+		},
+	});
 	let time;
 	setInterval(() => {
 		// loop through servers and call event update.
-		time = new Date();
-		servers.collection.forEach(server => {server.eventUpdate(time); server.scheduleUpdate(time)});
-	},60 * 1000) // 1 minute 
+		time = DateTime.local().setZone("America/New_York");
+		servers.collection.forEach(server => {
+			server.eventUpdate(time);
+			server.scheduleUpdate(time);
+		});
+	}, 60 * 1000); // 1 minute
 });
 client.on("messageReactionAdd", (messageReaction, user) => {
 	if (user.bot) return;
 	let serverId = messageReaction.message.guild.id;
 	let server = servers.get(serverId);
-	try{
+	try {
 		//
 		console.log(server.gamePlayers[server.gameCurrentPlayer].id);
-		if(user.id == server.gamePlayers[server.gameCurrentPlayer].id){ // game players array at index current game player
+		if (user.id == server.gamePlayers[server.gameCurrentPlayer].id) {
+			// game players array at index current game player
 			let userReact = messageReaction.emoji.name;
-			let col = numList.findIndex((el) => el == userReact)+1;
+			let col = numList.findIndex(el => el == userReact) + 1;
 			server.placeCircle(col);
 			server.sendGameState(messageReaction.message.channel);
-			if(server.winnerFound){
+			if (server.winnerFound) {
 				server.sendWin(messageReaction.message.channel);
 			}
 		}
-	} catch(err){
+	} catch (err) {
 		console.log(err);
 	}
-	
-//	if()
 
+	//	if()
 });
-client.on("message", (message) => {
+client.on("message", message => {
 	// if(message.author.bot) return;
-	try{
-		servers.get(message.guild.id,message.guild);
-	} catch(err){
+	try {
+		servers.get(message.guild.id, message.guild);
+	} catch (err) {
 		console.log(err);
 		console.log(message.content);
 	}
 
 	// User wants to issue a command
-	servers.get(message.guild.id).serverObject = message.guild; // need to do this a better way in the future. 
+	servers.get(message.guild.id).serverObject = message.guild; // need to do this a better way in the future.
 
 	let serverId;
 	let server;
 
 	if (message.content.startsWith(PREFIX)) {
-
 		const [cmdName, ...args] = message.content
 			.trim()
 			.substring(PREFIX.length)
@@ -96,7 +102,7 @@ client.on("message", (message) => {
 						.createPublicRequest(
 							args[1],
 							message.author,
-							message.channel
+							message.channel,
 						);
 				} else {
 					// servers
@@ -110,11 +116,11 @@ client.on("message", (message) => {
 				}
 				break;
 			case "cancel":
-				if(args[0] == '<@!185595163920302080>'){ // lol hard coded
+				if (args[0] == "<@!185595163920302080>") {
+					// lol hard coded
 					message.channel.send("You cannot cancel god.");
 				} else {
-				servers
-				.get(serverId).cancel(args[0],message.channel);
+					servers.get(serverId).cancel(args[0], message.channel);
 				}
 				break;
 			case "nextclass":
@@ -124,64 +130,93 @@ client.on("message", (message) => {
 				message.reply(server.classEnd(new Date()));
 				break;
 			case "event":
-				
 				//args[0] = (args[0] == undefined) ? "none":args[0];
-				args[0] = (args[0] || "none"); // this is the coolest piece of code ive wrote
+				args[0] = args[0] || "none"; // this is the coolest piece of code ive wrote
 
-				try{
-					switch(args[0].toLowerCase()){
+				try {
+					switch (args[0].toLowerCase()) {
 						case "create":
-							if(message.member.hasPermission('ADMINISTRATOR')){
-								message.reply("You are an admin, creating event");
-								server.eventManager.createEvent(message.member,message.channel);
+							if (message.member.hasPermission("ADMINISTRATOR")) {
+								message.reply(
+									"You are an admin, creating event",
+								);
+								server.eventManager.createEvent(
+									message.member,
+									message.channel,
+								);
 							} else {
 								message.reply("ayo youre not an admin");
 							}
 							break;
 						case "parameter":
-							if(server.eventManager.creatingEvent && server.eventManager.currentEventCreator == message.member){
-								server.eventManager.processParameter(message.content);
-							}
-							else if(!server.eventManager.creatingEvent){
-								message.reply("No event is current being made, you can start one using !event create");
-							} else{
-								message.reply("You are not the creator of the event.");
+							if (
+								server.eventManager.creatingEvent &&
+								server.eventManager.currentEventCreator ==
+									message.member
+							) {
+								server.eventManager.processParameter(
+									message.content,
+								);
+							} else if (!server.eventManager.creatingEvent) {
+								message.reply(
+									"No event is current being made, you can start one using !event create",
+								);
+							} else {
+								message.reply(
+									"You are not the creator of the event.",
+								);
 							}
 							break;
 						case "list":
 							message.reply("event list");
 							console.log(server.eventManager.events);
-							server.eventManager.events.forEach((event) => {
-							//	console.log(event.data.user.username);
-							const timingMessage = (event.data.days == 0) ? " Today":` in ${event.data.days} days`;
-								const eventEmbed = new MessageEmbed()							
-								.setColor('#90ee90')
-								.setTitle(event.data.name+timingMessage)
-								.setDescription(`Created by ${event.data.creator.user.username} \n ${event.data.description}`)
-								.setFooter(`${event.data.users.length} / ${event.data.limit}`);
+							server.eventManager.events.forEach(event => {
+								//	console.log(event.data.user.username);
+								const timingMessage =
+									event.data.days == 0
+										? " Today"
+										: ` in ${event.data.days} days`;
+								const eventEmbed = new MessageEmbed()
+									.setColor("#90ee90")
+									.setTitle(event.data.name + timingMessage)
+									.setDescription(
+										`Created by ${event.data.creator.user.username} \n ${event.data.description}`,
+									)
+									.setFooter(
+										`${event.data.users.length} / ${event.data.limit}`,
+									);
 								message.reply(eventEmbed);
-							})
+							});
 
 							break;
 						case "cancel":
 							let cancelMessage = "**Events:** \n";
 							console.log(server.eventManager.events);
-							for(const [index, element] of Object.entries(server.eventManager.events)){
+							for (const [index, element] of Object.entries(
+								server.eventManager.events,
+							)) {
 								console.log(element);
 								cancelMessage += `${numList[index]}. ${element.data.name} \n`;
 							}
-							message.channel.send(cancelMessage).then((message) => {
-								server.eventManager.cancelMessageID = message.id;
-								for(const [index,element] of Object.entries(server.eventManager.events)){
-									message.react(numList[index]);
-								}
-							})
+							message.channel
+								.send(cancelMessage)
+								.then(message => {
+									server.eventManager.cancelMessageID =
+										message.id;
+									for (const [
+										index,
+										element,
+									] of Object.entries(
+										server.eventManager.events,
+									)) {
+										message.react(numList[index]);
+									}
+								});
 							break;
 						case "help":
 							const eventHelpEmbed = new MessageEmbed()
-							.setColor('#90ee90')
-							.setTitle('Event Help Menu')
-							.setDescription(`
+								.setColor("#90ee90")
+								.setTitle("Event Help Menu").setDescription(`
 							**!event create**
 							  > create a new event, starts event creation process
 
@@ -212,16 +247,17 @@ client.on("message", (message) => {
 							message.reply("default");
 							break;
 					}
-				} catch(err){
+				} catch (err) {
 					console.log(err);
 					message.reply("error");
 				}
 				break;
 			case "help":
 				const helpEmbed = new MessageEmbed()
-				.setColor('#90ee90')
-				.setTitle('Help Menu')
-				.setDescription(`
+					.setColor("#90ee90")
+					.setTitle("Help Menu")
+					.setDescription(
+						`
 				**ADDED**
 				**!help **
 				  > Sends a list of all commands 
@@ -247,9 +283,12 @@ client.on("message", (message) => {
 					> sends a zoom link for the class depending on the time
 				**!sarthak**
 					> deletes the server
-				`)
-				.setThumbnail("https://cdn.discordapp.com/attachments/760776202121117706/772683453237559317/IMG_0529.PNG")
-				.setFooter(`** this is still a work in progress **`)
+				`,
+					)
+					.setThumbnail(
+						"https://cdn.discordapp.com/attachments/760776202121117706/772683453237559317/IMG_0529.PNG",
+					)
+					.setFooter(`** this is still a work in progress **`);
 				message.reply(helpEmbed);
 				break;
 			case "collectionstats":
@@ -258,25 +297,25 @@ client.on("message", (message) => {
 				break;
 			case "punch":
 				const attachment = new MessageAttachment(
-					"https://media1.tenor.com/images/cf5e2af366c79b1dbbbbb7d912484c58/tenor.gif?itemid=18215078"
+					"https://media1.tenor.com/images/cf5e2af366c79b1dbbbbb7d912484c58/tenor.gif?itemid=18215078",
 				);
 				message.reply("FALCON PUNCHHHHHHHH");
 				console.log(args);
 				if (message.mentions.users.array().length > 0) {
 					const icon = new MessageAttachment(
-						message.mentions.users.array()[0].avatarURL()
+						message.mentions.users.array()[0].avatarURL(),
 					);
 					message.channel.send(icon);
 				}
 				message.channel.send(attachment);
 				break;
 		}
-	} 
+	}
 
 	//  if message contains wordd 'obby"
 	//	message.content.toLowerCase().trim().split(/\s+/).includes("obby")
 	let words = message.content.toLowerCase().trim().split(/\s+/);
-	if(words.includes("gm") || words.includes("goodmorning")){
+	if (words.includes("gm") || words.includes("goodmorning")) {
 		message.channel.send("Good morning :)");
 	}
 });

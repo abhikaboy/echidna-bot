@@ -165,7 +165,7 @@ class Server {
 		}
 	}
 	test(channel) {
-		this.donaAlerts.send("This is a test alert!");
+		this.donaAlerts.send("This is a test alert bababooey!");
 		// this.serverObject.roles.fetch("756568508288073859").then((modRole) => {
 		// 	this.serverObject.members.fetch("364109616956702720").then((member) => {
 		// 		member.roles.remove(modRole);
@@ -384,15 +384,15 @@ class Server {
 	}
 	// Events
 	eventUpdate(time) {
-		let hour = time.getHours();
-		let minute = time.getMinutes();
+		let hour = time.c.hour;
+		let minute = time.c.minute;
 
 		// this.events.forEach((event) => event.update());
 	}
 	// School
 	scheduleUpdate(time, channel) {
-		let hour = time.getHours() + 5;
-		let minute = time.getMinutes();
+		let hour = time.c.hour;
+		let minute = time.c.minute;
 
 		schedule.forEach(block => {
 			block.checkStartWarning(
