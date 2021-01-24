@@ -45,8 +45,8 @@ client.on("ready", () => {
 		time = new Date();
 		time.setTime(time.getTime() + estOffset * 60 * 1000);
 		servers.collection.forEach(server => {
-			server.eventUpdate(formatter);
-			server.scheduleUpdate(formatter);
+			server.eventUpdate(time);
+			server.scheduleUpdate(time);
 		});
 	}, 60 * 1000); // 1 minute
 });
@@ -136,13 +136,16 @@ client.on("message", message => {
 				}
 				break;
 			case "nextclass":
-				let time = new Date();
+				time = new Date();
+				console.log(time.getTime() + "BEFORE");
 				time.setTime(time.getTime() + estOffset * 60 * 1000);
+				console.log(time.getTime() + "AFTER");
 				message.reply(server.nextClass(time));
 				break;
 			case "classend":
-				let time = new Date();
+				time = new Date();
 				time.setTime(time.getTime() + estOffset * 60 * 1000);
+				console.log(time);
 				message.reply(server.classEnd(time));
 				break;
 			case "event":

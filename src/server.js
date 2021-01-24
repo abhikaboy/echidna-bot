@@ -385,14 +385,14 @@ class Server {
 	// Events
 	eventUpdate(time) {
 		let hour = time.getHours();
-		let minute = time.getMintes();
+		let minute = time.getMinutes();
 
 		// this.events.forEach((event) => event.update());
 	}
 	// School
 	scheduleUpdate(time, channel) {
 		let hour = time.getHours();
-		let minute = time.getMintes();
+		let minute = time.getMinutes();
 
 		schedule.forEach(block => {
 			block.checkStartWarning(
