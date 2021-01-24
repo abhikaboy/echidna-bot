@@ -17,7 +17,15 @@ let servers = require("./serverCollection");
 let Server = require("./server");
 let event = require("./events.js");
 const { DateTime } = require("luxon");
-
+const options = {
+	timeZone: "America/New_York",
+	year: "numeric",
+	month: "numeric",
+	day: "numeric",
+	hour: "numeric",
+	minute: "numeric",
+	second: "numeric",
+};
 client.on("ready", () => {
 	console.log(`${client.user.username} online!`);
 	client.user.setPresence({
@@ -29,12 +37,15 @@ client.on("ready", () => {
 		},
 	});
 	let time;
+	const estOffset = -300;
 	setInterval(() => {
 		// loop through servers and call event update.
-		time = DateTime.local().setZone("America/New_York");
+
+		time = new Date();
+		time.setTime(time.getTime() + estOffset * 60 * 1000);
 		servers.collection.forEach(server => {
-			server.eventUpdate(time);
-			server.scheduleUpdate(time);
+			server.eventUpdate(formatter);
+			server.scheduleUpdate(formatter);
 		});
 	}, 60 * 1000); // 1 minute
 });
