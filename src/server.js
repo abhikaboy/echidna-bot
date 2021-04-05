@@ -75,12 +75,11 @@ const schedule = [
 
 */
 const schedule = [
-	new Block(7, 30, 78, "Block 1"),
-	new Block(8, 53, 89, "Block 2 + RAAAAAAVEN TIME POGGERSS"),
-	new Block(10, 27, 78, "Block 3"),
-	new Block(11, 45, 60, "Lunch Break"),
-	new Block(12, 47, 78, "Block 4"),
-];
+	new Block(8,20,virtualLen,"Block 1"), 
+	new Block(9,35,virtualLen,"Block 2"), 
+	new Block(10,50,virtualLen,"Block 3"), 
+	new Block(12,00,friLen,"Lunch Break"), 
+	new Block(12,40,virtualLen,"Block 4"),
 
 class Server {
 	constructor(id, serverObject) {

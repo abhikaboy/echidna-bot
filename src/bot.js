@@ -27,7 +27,7 @@ const options = {
 	second: "numeric",
 };
 
-const estOffset = -300;
+const estOffset = -240;
 client.on("ready", () => {
 	console.log(`${client.user.username} online!`);
 	client.user.setPresence({
