@@ -143,9 +143,9 @@ class Server {
 	// Gaming
 	setSchedule(type, channel) {
 		if (type == "normal") {
-			schedule = normal;
+			schedule = normalSchedule;
 		} else if (type == "virtual") {
-			schedule = virtual;
+			schedule = virtualSchedule;
 		}
 		channel.send("Set the schedule.");
 	}
