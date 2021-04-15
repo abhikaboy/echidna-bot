@@ -148,6 +148,8 @@ client.on("message", message => {
 				console.log(time);
 				message.reply(server.classEnd(time));
 				break;
+			case "setschedule":
+				server.setSchedule(args[0], message.channel);
 			case "event":
 				//args[0] = (args[0] == undefined) ? "none":args[0];
 				args[0] = args[0] || "none"; // this is the coolest piece of code ive wrote

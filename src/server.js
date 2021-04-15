@@ -34,7 +34,9 @@ class Block {
 		// warn people 1 minutes before class starts
 		// if this class is [warn time] before current time
 		let shouldWarn = this.minTime - currentTime == warnTime;
-		if (shouldWarn) {
+		let date = new Date();
+		let notWeekend = date.getDay() != 0 && date.getDay != 6;
+		if (shouldWarn && notWeekend) {
 			const embed = new MessageEmbed()
 				.setColor("#9400D3")
 				.setTitle(`${this.name} Will Start in ${warnTime} Minute(s)!`)
@@ -53,6 +55,8 @@ const pmLen = 20;
 const friLen = 30;
 
 const virtualLen = 65;
+const normalLen = 78;
+const ravenTimeLen = 11;
 /*
 
 const schedule = [
@@ -67,20 +71,31 @@ const schedule = [
     new Block(13,45,20,"Block 4 (PM)"),
 ]
 
-	new Block(8,20,virtualLen,"Block 1"), 
-	new Block(9,35,virtualLen,"Block 2"), 
-	new Block(10,50,virtualLen,"Block 3"), 
-	new Block(12,00,friLen,"Lunch Break"), 
-	new Block(12,40,virtualLen,"Block 4"),
+	new Block(8, 10, virtualLen, "Block 1"),
+	new Block(9, 25, virtualLen, "Block 2"),
+	new Block(10, 50, virtualLen, "Block 3"),
+	new Block(11, 55, friLen, "Lunch Break"),
+	new Block(12, 40, virtualLen, "Block 4"),
 
 */
-const schedule = [
+
+const virtualSchedule = [
 	new Block(8, 10, virtualLen, "Block 1"),
 	new Block(9, 25, virtualLen, "Block 2"),
 	new Block(10, 50, virtualLen, "Block 3"),
 	new Block(11, 55, friLen, "Lunch Break"),
 	new Block(12, 40, virtualLen, "Block 4"),
 ];
+
+const normalSchedule = [
+	new Block(7, 30, normalLen, "Block 1"),
+	new Block(8, 53, normalLen + ravenTimeLen, "Block 2"),
+	new Block(10, 27, normalLen, "Block 3"),
+	new Block(11, 45, normalLen - 5, "Lunch Break"),
+	new Block(12, 47, normalLen, "Block 4"),
+];
+
+let schedule = normalSchedule;
 class Server {
 	constructor(id, serverObject) {
 		this.id = id;
@@ -126,6 +141,14 @@ class Server {
 		);
 	}
 	// Gaming
+	setSchedule(type, channel) {
+		if (type == "normal") {
+			schedule = normal;
+		} else if (type == "virtual") {
+			schedule = virtual;
+		}
+		channel.send("Set the schedule.");
+	}
 	createPublicRequest(game, player1, channel) {
 		if (this.currentlyPlaying) {
 			channel.send("Theres already a game going on!");
