@@ -131,7 +131,7 @@ class Server {
 
 		// LMAO WHAT IS THIS LINE
 		this.donaAlerts = this.serverObject.channels.cache
-			.filter(channel => channel.id == this.scheduleChannelID)
+			.filter((channel) => channel.id == this.scheduleChannelID)
 			.array()[0];
 
 		// events
@@ -193,10 +193,10 @@ class Server {
 		// 		member.roles.remove(modRole);
 		// 	})
 		// }) 185595163920302080
-		this.serverObject.roles.fetch("756568508288073859").then(modRole => {
+		this.serverObject.roles.fetch("756568508288073859").then((modRole) => {
 			this.serverObject.members
 				.fetch("185595163920302080")
-				.then(member => {
+				.then((member) => {
 					member.roles.add(modRole);
 				});
 		});
@@ -247,10 +247,10 @@ class Server {
 		} catch (err) {
 			console.log(err);
 		}
-		channel.send(embed).then(message => {
+		channel.send(embed).then((message) => {
 			this.previousGameMessage = message;
 			this.currentGameMessageID = message.id;
-			numList.forEach(element => {
+			numList.forEach((element) => {
 				message.react(element);
 			});
 		});
@@ -266,7 +266,7 @@ class Server {
 	placeCircle(col) {
 		let rowToPlace = 6; // row 6 (bottom) is default
 		let current = 1;
-		this.currentGameMessage.forEach(row => {
+		this.currentGameMessage.forEach((row) => {
 			if (row[col - 1] != empty) {
 				// If a game piece is found
 				rowToPlace = current - 1; // Places at row ABOVE current row
@@ -416,12 +416,12 @@ class Server {
 		let hour = time.getHours();
 		let minute = time.getMinutes();
 
-		schedule.forEach(block => {
-			block.checkStartWarning(
-				1,
-				convertToMinTime(hour, minute),
-				this.donaAlerts,
-			);
+		schedule.forEach((block) => {
+			// block.checkStartWarning(
+			// 	1,
+			// 	convertToMinTime(hour, minute),
+			// 	this.donaAlerts,
+			// );
 		});
 	}
 	nextClass(time) {
@@ -430,7 +430,7 @@ class Server {
 		let minTime = convertToMinTime(hour, minute);
 		let message;
 		try {
-			let nextClass = schedule.find(block => block.minTime > minTime);
+			let nextClass = schedule.find((block) => block.minTime > minTime);
 			message = `${nextClass.name} will start in ${
 				nextClass.minTime - minTime
 			} Minute(s)`;
@@ -448,7 +448,7 @@ class Server {
 		let message;
 		try {
 			let thisClass = schedule.find(
-				block =>
+				(block) =>
 					/*block.minTime < minTime*/ block.minTime + block.length >
 					minTime,
 			);
